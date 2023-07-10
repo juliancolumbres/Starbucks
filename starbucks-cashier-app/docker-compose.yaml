@@ -1,0 +1,109 @@
+
+version: "3"
+
+services:
+  rabbit:
+    image: rabbitmq:3-management
+    platform: linux/amd64
+    ports:
+      - "9090:15672"
+      - "4369:4369"
+      - "5672:5672"
+    networks:
+      - starbucks  
+    restart: always    
+  mysql:
+    image: mysql:8.0
+    platform: linux/amd64
+    ports:
+      - "3306:3306"
+    networks:
+      - starbucks
+    environment:
+      MYSQL_ROOT_PASSWORD: "cmpe172"
+    restart: always
+  
+  starbucks-api:
+    image: spring-starbucks-api
+    platform: linux/amd64
+    depends_on:
+      - mysql
+      - rabbit
+    ports:
+      - "81:8080"
+    networks:
+      - starbucks
+    environment:
+      MYSQL_HOST: "mysql"
+      MYSQL_USERNAME: "root"
+      MYSQL_PASSWORD: "cmpe172"
+      RABBIT_HOST: "rabbit"
+      RABBIT_USERNAME: "guest"
+      RABBIT_PASSWORD: "guest"
+    restart: always
+  
+  
+  starbucks-cashier-app:
+    image: starbucks-cashier-app
+    platform: linux/amd64
+    depends_on:
+      - mysql
+    ports:
+      - 8080
+    networks:
+      - starbucks
+    environment:
+      MYSQL_HOST: "mysql"
+      MYSQL_USERNAME: "root"
+      MYSQL_PASSWORD: "cmpe172"
+      API_URL: "http://starbucks-cashier-app-starbucks-api-1:8080"
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 2
+  
+  worker:
+    image: starbucks-worker
+    platform: linux/amd64
+    depends_on:
+      - mysql
+      - rabbit
+    ports:
+      - 8080
+    networks:
+      - starbucks
+    environment:
+      MYSQL_HOST: "mysql"
+      MYSQL_USERNAME: "root"
+      MYSQL_PASSWORD: "cmpe172"
+      RABBIT_HOST: "rabbit"
+      RABBIT_USERNAME: "guest"
+      RABBIT_PASSWORD: "guest"
+    restart: always
+
+  lb-cashier:
+    image: eeacms/haproxy
+    platform: linux/amd64
+    depends_on:
+      - starbucks-cashier-app
+    ports:
+      - "80:5000"
+      - "1936:1936"
+    networks:
+      - starbucks
+    environment:
+      BACKENDS: "starbucks-cashier-app"
+      BACKENDS_PORT: "8080"
+      DNS_ENABLED: "true"
+      COOKIES_ENABLED: "false"
+      LOG_LEVEL: "info"
+
+
+volumes:
+  schemas:
+    external: false
+
+networks:
+  starbucks:
+    driver: bridge
+

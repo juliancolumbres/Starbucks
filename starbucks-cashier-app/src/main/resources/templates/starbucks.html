@@ -1,0 +1,193 @@
+
+<html>
+<head>
+    <title>Starbucks Reserved</title>
+
+<!-- <script type="text/javascript">
+    function selectedStore() {
+        reg = document.getElementById("register").value
+        switch(reg) {
+          case "5012349":
+            document.getElementById("stores").options[0].selected=true
+            break;
+          case "1287612":
+            document.getElementById("stores").options[1].selected=true
+            break;
+          case "6498234":
+            document.getElementById("stores").options[2].selected=true
+            break;
+          case "7812386":
+            document.getElementById("stores").options[3].selected=true
+            break;
+          case "8723098":
+            document.getElementById("stores").options[4].selected=true
+            break;
+          case "9621043":
+            document.getElementById("stores").options[5].selected=true
+            break;
+          case "1393478":
+            document.getElementById("stores").options[6].selected=true
+            break;
+          default:
+            document.getElementById("stores").options[0].selected=true
+        } 
+    }
+</script> -->
+
+
+<script th:inline="javascript">
+  // Get references to the country and city dropdowns
+  var drinksDropdown = document.getElementById("drinks");
+  
+  drinksDropdown.addEventListener("change", function() {
+      var selectedDrink = drinksDropdown.value;
+
+      if (selectedDrink === "Espresso") {
+        for (var i = 0; i < drinkDropdown.options.length; i++) {
+            var option = drinkDropdown.options[i];
+            if (option.classList.contains("espresso-size")) {
+                option.style.display = "";
+            } else {
+                option.style.display = "none";
+            }
+        }
+      }
+
+      else {
+        for (var i = 0; i < drinkDropdown.options.length; i++) {
+            var option = drinkDropdown.options[i];
+            if (option.classList.contains("espresso-size")) {
+                option.style.display = "none";
+            } else {
+                option.style.display = "";
+            }
+        }
+      }
+      
+      // Loop through the options of the city dropdown
+      for (var i = 0; i < sizesDropdown.options.length; i++) {
+          var currentOption = cityDropdown.options[i];
+          
+          // Hide the option if it belongs to a different country
+          if (option.classList.contains(selectedCountry)) {
+              option.style.display = "";
+          } else {
+              option.style.display = "none";
+          }
+      }
+      
+      // Select the first visible option
+      var firstVisibleOption = cityDropdown.querySelector("option:not([style='display: none;'])");
+      if (firstVisibleOption) {
+          firstVisibleOption.selected = true;
+      }
+  });
+</script>
+
+</head>
+
+<body onload="selectedStore()">
+
+<h1 align="center">Welcome to Starbucks Reserved</h1>
+
+<!-- FORM SECTION -->
+
+<form name="form" th:object="${command}" method="post" th:action="@{/cashier}">
+
+  <input type="hidden" name="register" id="register" th:field="*{register}" />
+
+    <p>
+    <div align="center">
+          <textarea readonly id="message" name="message" 
+                    cols="50" rows="13" th:text="${message}"/>
+    </div>
+    </p>
+
+    <div align="center">
+        <label for="stores">Select Store:</label>
+        <select name="stores" id="stores">
+          <option value="5012349">Dub-C</option>
+          <option value="1287612">P-Town</option>
+          <option value="6498234">The City</option>
+          <option value="7812386">Eso</option>
+          <option value="8723098">The Dro</option>
+          <option value="9621043">Mateo</option>
+          <option value="1393478">Deadwood</option>
+        </select> 
+    </div>
+
+    <br/>
+
+    <div align="center">
+      <label for="drinks">Select Drink:</label>
+      <select th:field="*{drink}" name="drinks" id="drinks">
+        <option value="Caffe Latte">Caffe Latte</option>
+        <option value="Caffe Americano">Caffe Americano</option>
+        <option value="Caffe Mocha">Caffe Mocha</option>
+        <option value="Cappuccino">Cappuccino</option>
+        <option value="Espresso">Espresso</option>
+      </select> 
+    </div>
+
+    <div align="center">
+      <label for="sizes">Select Size:</label>
+      <select th:field="*{size}" name="sizes" id="sizes">
+        <option class="default-size espresso-size"  value="Tall">Tall</option>
+        <option class="default-size" value="Grande">Grande</option>
+        <option class="default-size"value="Venti">Venti</option>
+        <option class="default-size" value="Your Own Cup">Your Own Cup</option>
+        <option class="default-size espresso-size" value="Short">Short</option>
+      </select> 
+    </div>
+    
+    <div align="center">
+      <label for="milks">Select Milk:</label>
+      <select th:field="*{milk}" name="milks" id="milks">
+        <option value="Whole Milk">Whole Milk</option>
+        <option value="2% Milk">2% Milk</option>
+        <option value="Nonfat Milk">Nonfat Milk</option>
+        <option value="Almond Milk">Almond Milk</option>
+        <option value="Soy Milk">Soy Milk</option>
+      </select> 
+    </div>         
+
+
+    <br/>
+
+    <p align="center"><img src="/images/starbucks.jpg"></p>
+
+    <br/>
+
+    <p align="center">
+        <input type="submit" name="action" id="btnGetOrder" value="Get Order">
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="submit" name="action" id="btnPlaceOrder" value="Place Order">
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="submit" name="action" id="btnClearOrder" value="Clear Order">
+    </p>
+
+</form>
+
+<!-- END FORM SECTION -->
+
+<br/>
+<br/>
+
+<div align="center">
+    <pre>Server Host/IP:  <span th:text="${server}" /></pre>
+</div>
+
+<br/>
+<br/>
+
+<!-- LOGOUT SECTION -->
+<div class="center">
+  <form th:action="@{/logout}" method="post">
+      <input type="submit" value="Sign Out"/>
+  </form>
+  </div>
+
+
+</body>
+</html>
+
